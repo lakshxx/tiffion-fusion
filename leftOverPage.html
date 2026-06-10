@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donate Leftover Food | Tiffin Fusion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 30px;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #218838;
+        }
+        
+        .success {
+            color: green;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .food-items {
+            margin-bottom: 15px;
+        }
+        
+        .food-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .food-row input {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Donate Leftover Food</h2>
+        <div id="success-msg" class="success"></div>
+        <form id="donationForm">
+            <input type="text" id="name" placeholder="Contributor Name (Restaurant/Wedding)" required />
+
+            <div class="food-items" id="food-items">
+                <label><b>Available Food Items</b></label>
+                <div class="food-row">
+                    <input type="text" placeholder="Food Item (e.g. Rice)" class="food-name" required />
+                    <input type="text" placeholder="Quantity (e.g. 5 kg)" class="food-qty" required />
+                    <input type="datetime-local" class="food-expiry" required />
+                </div>
+            </div>
+            <button type="button" onclick="addFoodRow()">+ Add Another Food Item</button>
+
+            <input type="text" id="pickup" placeholder="Pickup Window (e.g. 4 PM - 6 PM)" required />
+            <input type="text" id="contact" placeholder="Contact Number" required />
+            <textarea id="address" placeholder="Address" rows="2" required></textarea>
+            <button type="submit">Submit Donation</button>
+        </form>
+    </div>
+
+    <script>
+        function addFoodRow() {
+            const row = document.createElement('div');
+            row.className = 'food-row';
+            row.innerHTML = `
+      <input type="text" placeholder="Food Item (e.g. Rice)" class="food-name" required />
+      <input type="text" placeholder="Quantity (e.g. 5 kg)" class="food-qty" required />
+      <input type="datetime-local" class="food-expiry" required />
+    `;
+            document.getElementById('food-items').appendChild(row);
+        }
+
+        document.getElementById('donationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const foodNames = document.querySelectorAll('.food-name');
+            const foodQties = document.querySelectorAll('.food-qty');
+            const foodExpiries = document.querySelectorAll('.food-expiry');
+
+            const foodList = [];
+
+            for (let i = 0; i < foodNames.length; i++) {
+                foodList.push({
+                    item: foodNames[i].value,
+                    quantity: foodQties[i].value,
+                    expiry: foodExpiries[i].value
+                });
+            }
+
+            const donation = {
+                name: document.getElementById('name').value,
+                foodItems: foodList,
+                pickup: document.getElementById('pickup').value,
+                contact: document.getElementById('contact').value,
+                address: document.getElementById('address').value,
+            };
+
+            let donations = JSON.parse(localStorage.getItem('donations')) || [];
+            donations.push(donation);
+            localStorage.setItem('donations', JSON.stringify(donations));
+
+            document.getElementById('donationForm').reset();
+            document.getElementById('success-msg').innerText = "Donation submitted successfully!";
+            document.getElementById('food-items').innerHTML = `
+      <label><b>Available Food Items</b></label>
+      <div class="food-row">
+        <input type="text" placeholder="Food Item (e.g. Rice)" class="food-name" required />
+        <input type="text" placeholder="Quantity (e.g. 5 kg)" class="food-qty" required />
+        <input type="datetime-local" class="food-expiry" required />
+      </div>
+    `;
+        });
+    </script>
+
+</body>
+
+</html>
